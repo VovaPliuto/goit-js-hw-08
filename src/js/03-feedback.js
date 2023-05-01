@@ -5,15 +5,25 @@ const refs = {
 };
 
 refs.formEl.addEventListener('input', throttle(onFormInput, 500));
-refs.formEl.addEventListener('submit', throttle(onSubmitForm, 500));
+refs.formEl.addEventListener('submit', onSubmitForm);
 
 let dataObj = {};
 
 if (localStorage.getItem('feedback-form-state') !== null) {
   dataObj = JSON.parse(localStorage.getItem('feedback-form-state'));
 
-  refs.formEl.firstElementChild.children[0].value = dataObj.email;
-  refs.formEl.firstElementChild.nextElementSibling.children[0].value = dataObj.message;
+  if (dataObj.email !== undefined) {
+    refs.formEl.firstElementChild.children[0].value = dataObj.email.trim();
+  } else { 
+    refs.formEl.firstElementChild.children[0].value = "";
+  }
+
+  if (dataObj.message !== undefined) {
+    refs.formEl.firstElementChild.nextElementSibling.children[0].value =
+      dataObj.message.trim();
+  } else { 
+    refs.formEl.firstElementChild.nextElementSibling.children[0].value = '';
+  }
 };
 
 function onFormInput(e) {
@@ -32,8 +42,13 @@ function onFormInput(e) {
 function onSubmitForm(e) { 
   e.preventDefault();
 
+  if (dataObj.email === undefined || dataObj.message === undefined) { 
+    return alert('Поля мають бути заповнені')
+  };
+
   console.log(dataObj);
   localStorage.clear();
+  dataObj = {};
 
   refs.formEl.firstElementChild.children[0].value = "";
   refs.formEl.firstElementChild.nextElementSibling.children[0].value = "";
